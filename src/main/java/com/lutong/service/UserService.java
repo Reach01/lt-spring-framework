@@ -2,6 +2,7 @@ package com.lutong.service;
 
 import com.lutong.spring.Autowire;
 import com.lutong.spring.Component;
+import com.lutong.spring.InitializingBean;
 import com.lutong.spring.Scope;
 
 /**
@@ -12,7 +13,7 @@ import com.lutong.spring.Scope;
  */
 @Component("userService")
 @Scope("singleton")
-public class UserService {
+public class UserService implements InitializingBean {
 
     @Autowire
     private OrderService orderService;
@@ -20,5 +21,10 @@ public class UserService {
     public void test() {
         System.out.println("lutong spring framework dev success!");
         System.out.println(orderService);
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("userService 初始化...");
     }
 }

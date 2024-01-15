@@ -5,7 +5,9 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +22,7 @@ public class ApplicationContext {
 
     private Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
     private Map<String, Object> singletonMap = new HashMap<>();
+    private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     public ApplicationContext(Class appConfig) {
         this.appConfig = appConfig;
@@ -62,19 +65,29 @@ public class ApplicationContext {
                     try {
                         Class<?> clazz = classLoader.loadClass(absolutePath);
                         if (clazz.isAnnotationPresent(Component.class)) {
+                            if(BeanPostProcessor.class.isAssignableFrom(clazz)){
+                                beanPostProcessors.add((BeanPostProcessor) clazz.getConstructor().newInstance());
+                                continue;
+                            }
                             String scope = "singleton";
                             if(clazz.isAnnotationPresent(Scope.class)){
                                 scope = clazz.getAnnotation(Scope.class).value();
                             }
                             String beanName = clazz.getAnnotation(Component.class).value();
+                            // 如果是空，则默认取类名小写首字母作为beanName
                             if("".equals(beanName)){
-                                System.out.println("clazz.getSimpleName():"+clazz.getSimpleName());
                                 beanName = Introspector.decapitalize(clazz.getSimpleName());
                             }
                             BeanDefinition beanDefinition = new BeanDefinition(beanName, scope, clazz);
                             beanDefinitionMap.put(beanName, beanDefinition);
                         }
-                    } catch (ClassNotFoundException e) {
+                    } catch (ClassNotFoundException | NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
@@ -92,6 +105,12 @@ public class ApplicationContext {
                     field.setAccessible(true);
                     field.set(bean, getBean(field.getName()));
                 }
+            }
+            if (bean instanceof InitializingBean) {
+                ((InitializingBean) bean).afterPropertiesSet();
+            }
+            for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+                beanPostProcessor.postProcessAfterInitialization(bean, beanName);
             }
             return bean;
         } catch (InstantiationException e) {
