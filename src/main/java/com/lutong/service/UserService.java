@@ -1,9 +1,6 @@
 package com.lutong.service;
 
-import com.lutong.spring.Autowire;
-import com.lutong.spring.Component;
-import com.lutong.spring.InitializingBean;
-import com.lutong.spring.Scope;
+import com.lutong.spring.*;
 
 /**
  * @Description
@@ -13,21 +10,29 @@ import com.lutong.spring.Scope;
  */
 @Component("userService")
 @Scope("singleton")
-public class UserService implements InitializingBean {
+public class UserService implements InitializingBean, BeanNameAware {
 
     /*@Autowire
     private OrderService orderService;*/
 
     @LutongValue("lutong")
-    private String name;
+    private String value;
+
+    private String beanName;
 
     public void test() {
         System.out.println("UserService test()...");
-        System.out.println("name: " + name);
+        System.out.println("name: " + value);
+        System.out.println("beanName: " + beanName);
     }
 
     @Override
     public void afterPropertiesSet() {
         System.out.println("userService 初始化...");
+    }
+
+    @Override
+    public void setBeanName(String name) {
+        this.beanName = name;
     }
 }

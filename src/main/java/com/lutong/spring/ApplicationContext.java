@@ -99,6 +99,7 @@ public class ApplicationContext {
         Class clazz = beanDefinition.getClazz();
         try {
             Object bean = clazz.getConstructor().newInstance();
+            // 依赖注入
             Field[] fields = clazz.getDeclaredFields();
             for (Field field : fields) {
                 if (field.isAnnotationPresent(Autowire.class)) {
@@ -106,12 +107,19 @@ public class ApplicationContext {
                     field.set(bean, getBean(field.getName()));
                 }
             }
+            // aware回调
+            if (bean instanceof BeanNameAware) {
+                ((BeanNameAware) bean).setBeanName(beanName);
+            }
+            // 初始化前
             for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
                 bean = beanPostProcessor.postProcessBeforeInitialization(bean, beanName);
             }
+            // 初始化
             if (bean instanceof InitializingBean) {
                 ((InitializingBean) bean).afterPropertiesSet();
             }
+            // 初始化后
             for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
                 bean = beanPostProcessor.postProcessAfterInitialization(bean, beanName);
             }
