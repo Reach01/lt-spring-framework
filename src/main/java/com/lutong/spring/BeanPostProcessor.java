@@ -8,7 +8,7 @@ package com.lutong.spring;
  */
 public interface BeanPostProcessor {
 
-    default Object postProcessBeforeInitialization(Object bean, String beanName) {
+    default Object postProcessBeforeInitialization(Object bean, String beanName) throws IllegalAccessException {
         return bean;
     }
 

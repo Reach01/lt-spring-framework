@@ -1,6 +1,7 @@
 package com.lutong.test;
 
 import com.lutong.AppConfig;
+import com.lutong.service.OrderInterface;
 import com.lutong.service.OrderService;
 import com.lutong.service.UserService;
 import com.lutong.spring.ApplicationContext;
@@ -16,6 +17,8 @@ public class TestSpring {
     public static void main(String[] args) {
         ApplicationContext applicationContext = new ApplicationContext(AppConfig.class);
         UserService userService = (UserService) applicationContext.getBean("userService");
+        OrderInterface orderService = (OrderInterface) applicationContext.getBean("orderService");
         userService.test();
+        orderService.test();
     }
 }

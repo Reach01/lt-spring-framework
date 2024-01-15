@@ -15,12 +15,15 @@ import com.lutong.spring.Scope;
 @Scope("singleton")
 public class UserService implements InitializingBean {
 
-    @Autowire
-    private OrderService orderService;
+    /*@Autowire
+    private OrderService orderService;*/
+
+    @LutongValue("lutong")
+    private String name;
 
     public void test() {
-        System.out.println("lutong spring framework dev success!");
-        System.out.println(orderService);
+        System.out.println("UserService test()...");
+        System.out.println("name: " + name);
     }
 
     @Override

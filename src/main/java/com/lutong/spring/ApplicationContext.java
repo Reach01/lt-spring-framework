@@ -106,11 +106,14 @@ public class ApplicationContext {
                     field.set(bean, getBean(field.getName()));
                 }
             }
+            for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+                bean = beanPostProcessor.postProcessBeforeInitialization(bean, beanName);
+            }
             if (bean instanceof InitializingBean) {
                 ((InitializingBean) bean).afterPropertiesSet();
             }
             for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
-                beanPostProcessor.postProcessAfterInitialization(bean, beanName);
+                bean = beanPostProcessor.postProcessAfterInitialization(bean, beanName);
             }
             return bean;
         } catch (InstantiationException e) {

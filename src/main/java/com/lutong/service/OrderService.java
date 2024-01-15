@@ -9,5 +9,10 @@ import com.lutong.spring.Component;
  * @Version 1.0.0
  */
 @Component
-public class OrderService {
+public class OrderService implements OrderInterface {
+
+    @Override
+    public void test() {
+        System.out.println("orderService test()...");
+    }
 }
